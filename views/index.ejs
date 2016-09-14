@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+        <style>
+        input, textarea {
+            width: 100%;
+        }
+        </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js" charset="utf-8"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js" charset="utf-8"></script>
+        <script>
+            $(document).ready(function() {
+                console.log('DOM loaded');
+                var socket = io.connect();
+
+                function enterName () {
+                    var name = prompt('Please enter your name');
+                    //Emitting to server the name
+                    socket.emit('user_entered', {name: name});
+                }
+                //turn the array of users into a string that i want to add
+                function usersToString(users) {
+                    var str = '';
+                    //loops through the users
+                    for (var i in users) {
+                        str = str
+                        + '<div class="row">'
+                            + users[i]
+                        + '</div>'
+                    }
+                    return str;
+                }
+                function messagesToString(messages) {
+                    var str = '';
+                    for (var i = 0; i < messages.length; i++) {
+                        str = str
+                        + '<div class="row">'
+                            + '<div class="columns three">'
+                                + messages[i].name
+                            + '</div>'
+                            + '<div class="columns nine">'
+                                + messages[i].message
+                            + '</div>'
+                        + '</div>'
+                    }
+                    return str;
+                }
+                //Prompt for name
+                enterName();
+                //Bad name entered, lets try that again
+                socket.on('bad_name', function(data) {
+                    //Prompting again
+                    enterName();
+                })
+
+                //update the whole users list
+                socket.on('user', function(data) {
+                    //updates the users html
+                    $('#users').html(usersToString(data.users));
+                })
+                socket.on('message', function(data) {
+                    //updates the messages html
+                    $('#messages').html(messagesToString(data.messages));
+                    // document.getElementById('messages').textContent = JSON.stringify(data.messages);
+                })
+
+                $('#chat').submit(function(e) {
+                    e.preventDefault();
+                    var new_message = $('#chatbox').val();
+                    socket.emit('client_send', {message: new_message});
+                    $('#chatbox').val('');
+                    $('#chatbox').focus();
+                })
+            })
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="columns nine">
+                    Chatbox
+                    <div id="messages"></div>
+                </div>
+                <div class="columns three">
+                    Users
+                    <div id="users"></div>
+                </div>
+            </div>
+            <form id="chat">
+                <div class="row">
+                    <div class="columns nine">
+                        <textarea id="chatbox"></textarea>
+                    </div>
+                    <div class="columns three">
+                        <input type="submit" value="Send">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>

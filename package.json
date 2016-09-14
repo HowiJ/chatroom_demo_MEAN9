@@ -1,0 +1,18 @@
+{
+  "name": "chatroom_20160913",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "Howard Jiang <me@howardjiang.com> (http://howardjiang.com)",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.5.2",
+    "express": "^4.14.0",
+    "socket.io": "^1.4.8"
+  }
+}
